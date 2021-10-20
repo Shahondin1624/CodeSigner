@@ -1,0 +1,74 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'java-library-distribution'
+    id 'maven-publish'
+}
+
+group 'com.github.Shahondin1624'
+description = 'Utility that can wrap any code to perform a check whether specific files have been altered and stop execution' +
+        ' depending on the result of this check'
+java.sourceCompatibility = JavaVersion.VERSION_16
+java.modularity.inferModulePath = true
+version '0.9'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'ch.qos.logback:logback-classic:1.2.6'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+distributions {
+    main {
+        distributionBaseName = 'CodeSigner'
+    }
+}
+
+sourceSets {
+    main.java.srcDir 'src/main'
+    test.java.srcDir 'src/test'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    archiveBaseName.set('CodeSigner')
+    archiveVersion.set('0.9')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'description' : 'Utility that can wrap any code to perform a check whether specific files have been altered and stop execution' +
+                ' depending on the result of this check'
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+task packageSources(type: Jar, dependsOn: 'classes') {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+artifacts {
+    archives packageJavadoc
+    archives packageSources
+}
