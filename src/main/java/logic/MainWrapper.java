@@ -1,5 +1,8 @@
 package logic;
 
+import asymetricEncryption.AsymmetricAlgorithmProvider;
+import hashing.HashParameters;
+import hashing.HashProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,38 +21,40 @@ public class MainWrapper {
 
     /***
      *
-     * @param paths relative to working dir
-     * @param hashedPassword use {@link PasswordHasher#main(String[])} and supply your password as only argument to generate
-     *                       a valid hash
+     * @param paths of the files that should be monitored for modification. Have to be supplied relative to working dir
+     * @param hashedPassword the password has to be hashed manually and then provided as a string
+     * @param parameters have to be those that have been used when generating the password hash
      */
-    public static void execute(String[] paths, String hashedPassword) {
+    public static void execute(String[] paths, String hashedPassword, HashProvider hashProvider,
+                               AsymmetricAlgorithmProvider asymmetricAlgorithmProvider, HashParameters parameters) {
         try {
             logger.debug("Initializing checkup procedure");
-            Utilities util = new Utilities();
+            Utilities util = new Utilities(hashProvider, asymmetricAlgorithmProvider);
             boolean masterKeyExists = util.masterKeyFileExists();
             boolean hashFileExists = util.hashFileExists();
             if (masterKeyExists && hashFileExists) {
                 if (!util.hashesMatch(paths)) {
                     logger.debug("Checksums do not match, a new hash has to be generated");
-                    executeCompleteSignProcess(paths, hashedPassword, util);
+                    executeCompleteSignProcess(paths, hashedPassword, util, parameters);
                 }
             } else {
                 logger.debug("MasterKey file exists: {}; HashFile exists {}. Because of that a new signing is required",
                         masterKeyExists, hashFileExists);
-                executeCompleteSignProcess(paths, hashedPassword, util);
+                executeCompleteSignProcess(paths, hashedPassword, util, parameters);
             }
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | InvalidKeySpecException |
                 BadPaddingException | InvalidKeyException e) {
             e.printStackTrace();
         }
     }
+
     //TODO make input field a password field
-    private static void executeCompleteSignProcess(String[] paths, String hashedPassword, Utilities util) throws NoSuchAlgorithmException,
+    private static void executeCompleteSignProcess(String[] paths, String hashedPassword, Utilities util, HashParameters parameters)
+            throws NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         String password = JOptionPane.showInputDialog("Insert password to regenerate checksum");
-        password = Utilities.bytesToHex(util.hashPassword(password));
         //Program execution has to stop when an invalid program is supplied
-        if (!password.equals(hashedPassword)) {
+        if (!util.passwordMatches(password, hashedPassword, parameters)) {
             logger.error("Wrong password supplied. Aborting execution");
             System.exit(-1);
         }
