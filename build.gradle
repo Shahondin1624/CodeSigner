@@ -19,7 +19,9 @@ repositories {
 dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.32'
     //https://github.com/phxql/argon2-jvm requires to have the argon2 C-library installed on executing computer
-    implementation 'de.mkammerer:argon2-jvm-nolibs:2.11'
+    //or use implementation 'de.mkammerer:argon2-jvm:2.11' instead
+    //implementation 'de.mkammerer:argon2-jvm-nolibs:2.11'
+    implementation 'de.mkammerer:argon2-jvm:2.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testImplementation 'ch.qos.logback:logback-classic:1.2.6'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

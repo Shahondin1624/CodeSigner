@@ -8,6 +8,7 @@ import de.mkammerer.argon2.Argon2Factory;
  */
 public class ArgonProvider implements HashProvider {
     private final Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+
     @Override
     public String hash(String password, HashParameters parameters) {
         try {

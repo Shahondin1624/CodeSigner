@@ -8,18 +8,18 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-public class ECCProvider extends AbstractProvider {
-    private final Logger logger = LoggerFactory.getLogger(ECCProvider.class);
+public class ECProvider extends AbstractProvider {
+    private final Logger logger = LoggerFactory.getLogger(ECProvider.class);
     private final String algorithmInstance;
     private final String algorithmProvider;
     private final String parameterSpec;
     private final String signatureInstance;
 
-    public ECCProvider() {
+    public ECProvider() {
         this("EC", null, "secp256r1", "SHA256withECDSA");
     }
 
-    public ECCProvider(String algorithmInstance, String algorithmProvider, String parameterSpec, String signatureInstance) {
+    public ECProvider(String algorithmInstance, String algorithmProvider, String parameterSpec, String signatureInstance) {
         this.algorithmInstance = algorithmInstance;
         this.algorithmProvider = algorithmProvider;
         this.parameterSpec = parameterSpec;

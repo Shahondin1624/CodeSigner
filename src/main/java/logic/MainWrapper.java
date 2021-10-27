@@ -10,6 +10,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -48,11 +51,10 @@ public class MainWrapper {
         }
     }
 
-    //TODO make input field a password field
     private static void executeCompleteSignProcess(String[] paths, String hashedPassword, Utilities util, HashParameters parameters)
             throws NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
-        String password = JOptionPane.showInputDialog("Insert password to regenerate checksum");
+        String password = inquirePasswordFromUser("Insert password to regenerate checksum");
         //Program execution has to stop when an invalid program is supplied
         if (!util.passwordMatches(password, hashedPassword, parameters)) {
             logger.error("Wrong password supplied. Aborting execution");
@@ -60,9 +62,20 @@ public class MainWrapper {
         }
         logger.debug("Attempting a new sign");
         util.sign(paths);
-        logger.debug("Signing completed. System terminates now");
-        System.exit(1);
+        //commented out because when a trusted password is supplied the code should run immediately and not need to be restarted
+//        logger.debug("Signing completed. System terminates now");
+//        System.exit(1);
     }
 
+    private static String inquirePasswordFromUser(String message) {
+        String input =  PasswordPanel.showDialog(null, "Enter password", message);
+        if (input != null) {
+            return input;
+        } else {
+            logger.error("User did not supply a password, aborting execution");
+            System.exit(-1);
+            return null;
+        }
+    }
 
 }

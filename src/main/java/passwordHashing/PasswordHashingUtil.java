@@ -10,10 +10,6 @@ import org.slf4j.LoggerFactory;
 public class PasswordHashingUtil {
     private static final Logger logger = LoggerFactory.getLogger(PasswordHashingUtil.class);
 
-    public String hashPassword(HashProvider provider, String password, HashParameters parameters) {
-        return new Utilities(provider, null).hashPassword(password, parameters);
-    }
-
     public static void main(String[] args) {
         if (args.length == 4) {
             System.out.printf("Hashed password : %s%n", new PasswordHashingUtil().hashPassword(new ArgonProvider(), args[0], parseArgs(args)));
@@ -32,5 +28,9 @@ public class PasswordHashingUtil {
                     e.getClass().getSimpleName(), e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public String hashPassword(HashProvider provider, String password, HashParameters parameters) {
+        return new Utilities(provider, null).hashPassword(password, parameters);
     }
 }

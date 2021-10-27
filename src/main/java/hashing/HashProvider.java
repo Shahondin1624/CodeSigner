@@ -5,5 +5,6 @@ package hashing;
  */
 public interface HashProvider {
     String hash(String password, HashParameters parameters);
+
     boolean hashMatches(String password, String hash, HashParameters parameters);
 }

@@ -1,6 +1,8 @@
 package logic;
 
 import asymetricEncryption.AsymmetricAlgorithmProvider;
+import asymetricEncryption.ECProvider;
+import hashing.ArgonProvider;
 import hashing.HashParameters;
 import hashing.HashProvider;
 import org.slf4j.Logger;
@@ -13,20 +15,27 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 public class Utilities {
-    private final Logger logger = LoggerFactory.getLogger(Utilities.class);
     protected static final String MASTER_KEY_FILE = "masterkey";
     protected static final String HASH_FILE = "system.hash";
+    private final Logger logger = LoggerFactory.getLogger(Utilities.class);
     private final HashProvider hashProvider;
     private final AsymmetricAlgorithmProvider asymmetricAlgorithmProvider;
 
     public Utilities(HashProvider hashProvider, AsymmetricAlgorithmProvider asymmetricAlgorithmProvider) {
         this.hashProvider = hashProvider;
         this.asymmetricAlgorithmProvider = asymmetricAlgorithmProvider;
+    }
+
+    public Utilities() {
+        this(new ArgonProvider(), new ECProvider());
     }
 
     @Deprecated
@@ -48,12 +57,16 @@ public class Utilities {
     }
 
     /***
-     * Use /? to mask file separators as these will be supplied during runtime
+     * Use %s to mask file separators as these will be supplied during runtime
      * @param name complete path after working dir
      * @return created path
      */
-    protected Path derivePathFromWorkingDir(String name) {
-        return Path.of(System.getProperty("user.dir") + File.separator + name.replaceAll("&/", File.separator));
+    public Path derivePathFromWorkingDir(String name) {
+        switch (OsCheck.getOperatingSystemType()) {
+            case Linux, MacOS, Other -> name = name.replaceAll("\\\\", "/");
+            case Windows -> name = name.replaceAll("/", "\\\\");
+        }
+        return Path.of(System.getProperty("user.dir") + File.separator + name);
     }
 
     protected KeyPair generateKeyPair() {
